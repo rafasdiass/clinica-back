@@ -1,24 +1,22 @@
-import { IsNotEmpty, IsString, ValidateIf } from 'class-validator';
+import { IsNotEmpty, IsString, ValidateIf, IsNumber } from 'class-validator';
 
 export class CreateExamDto {
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  name: string;
+  typeId: number;
 
   @IsString()
   description?: string;
 
   @IsNotEmpty()
-  patientId: number; // Paciente que solicitou o exame
+  patientId: number;
 
-  // Caso seja um médico interno
   @ValidateIf((o) => !o.externalDoctorName && !o.externalDoctorCrm)
   @IsNotEmpty({
     message: 'Doctor ID is required if external doctor is not provided',
   })
   doctorId?: number;
 
-  // Caso seja um médico externo
   @ValidateIf((o) => !o.doctorId)
   @IsNotEmpty({
     message:

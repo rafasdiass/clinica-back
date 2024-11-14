@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ExamType } from './exam-type.entity';
 import { User } from '../../users/entities/user.entity';
 import { Doctor } from '../../doctors/entities/doctor.entity';
 
@@ -14,37 +15,31 @@ export class Exam {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  name: string; // Nome do exame
+  @ManyToOne(() => ExamType, { eager: true })
+  type: ExamType;
 
   @Column({ nullable: true })
-  description: string; // Descrição do exame
+  description: string;
 
   @Column({ nullable: true })
-  result: string; // Resultado do exame
+  result: string;
 
   @Column({ nullable: true })
-  resultImage: string; // URL da imagem do exame
+  resultImage: string;
 
-  // Médico interno
-  @ManyToOne(() => Doctor, (doctor) => doctor.exams, {
-    nullable: true,
-    eager: true,
-  })
+  @ManyToOne(() => Doctor, { nullable: true, eager: true })
   doctor: Doctor;
 
-  // Médico externo
   @Column({ nullable: true })
-  externalDoctorName: string; // Nome do médico externo
+  externalDoctorName: string;
 
   @Column({ nullable: true })
-  externalDoctorCrm: string; // CRM do médico externo
+  externalDoctorCrm: string;
 
-  // Paciente que solicitou o exame
-  @ManyToOne(() => User, (user) => user.exams, { eager: true })
+  @ManyToOne(() => User, { eager: true })
   patient: User;
 
-  @Column({ default: 'pending' }) // Status do exame (ex: pending, completed)
+  @Column({ default: 'pending' })
   status: string;
 
   @CreateDateColumn()

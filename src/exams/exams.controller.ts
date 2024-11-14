@@ -13,6 +13,7 @@ import { ExamsService } from './exams.service';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { User } from '../users/entities/user.entity';
 
 @Controller('exams')
 @UseGuards(JwtAuthGuard)
@@ -20,26 +21,26 @@ export class ExamsController {
   constructor(private readonly examsService: ExamsService) {}
 
   /**
-   * Retorna todos os exames.
+   * Retorna todos os exames baseados nas permissões do usuário logado.
    */
   @Get()
-  findAll() {
-    return this.examsService.findAll();
+  findAll(@Req() req: { user: User }) {
+    return this.examsService.findAll(req.user);
   }
 
   /**
-   * Retorna um exame específico se o usuário tiver permissão.
+   * Retorna todos os tipos de exames disponíveis.
    */
-  @Get(':id')
-  findOne(@Param('id') id: string, @Req() req) {
-    return this.examsService.findOne(+id, req.user); // Inclui `req.user` para o método `findOne`.
+  @Get('types')
+  findAllTypes() {
+    return this.examsService.findAllTypes();
   }
 
   /**
    * Cria um novo exame.
    */
   @Post()
-  create(@Body() createExamDto: CreateExamDto) {
+  create(@Body() createExamDto: CreateExamDto, @Req() req: { user: User }) {
     return this.examsService.create(createExamDto);
   }
 
@@ -50,16 +51,16 @@ export class ExamsController {
   update(
     @Param('id') id: string,
     @Body() updateExamDto: UpdateExamDto,
-    @Req() req,
+    @Req() req: { user: User },
   ) {
-    return this.examsService.update(+id, updateExamDto, req.user); // Inclui `req.user` para o método `update`.
+    return this.examsService.update(+id, updateExamDto, req.user);
   }
 
   /**
    * Remove um exame existente.
    */
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req) {
-    return this.examsService.remove(+id, req.user); // Inclui `req.user` para o método `remove`.
+  remove(@Param('id') id: string, @Req() req: { user: User }) {
+    return this.examsService.remove(+id, req.user);
   }
 }
