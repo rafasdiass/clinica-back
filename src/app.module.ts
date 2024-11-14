@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -11,12 +12,24 @@ import { ExamsModule } from './exams/exams.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'database.sqlite',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Deve ser false em produção para evitar perda de dados.
+    // Configuração global para variáveis de ambiente
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env', // Carrega variáveis do arquivo .env
     }),
+
+    // Configuração do banco de dados usando TypeORM
+    TypeOrmModule.forRootAsync({
+      useFactory: () => ({
+        type: process.env.TYPEORM_CONNECTION as 'sqlite', // Banco definido no .env
+        database: process.env.TYPEORM_DATABASE || 'database.sqlite', // Nome do arquivo SQLite
+        synchronize: process.env.TYPEORM_SYNCHRONIZE === 'true', // Sincronização automática das entidades
+        logging: process.env.TYPEORM_LOGGING === 'true', // Habilita logs de queries
+        autoLoadEntities: true, // Carrega automaticamente todas as entidades registradas
+      }),
+    }),
+
+    // Módulos do sistema
     AuthModule,
     UsersModule,
     DoctorsModule,

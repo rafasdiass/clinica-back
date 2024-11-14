@@ -39,4 +39,9 @@ export class DoctorsController {
   remove(@Param('id') id: string) {
     return this.doctorsService.remove(+id);
   }
+
+  @Post('seed')
+  seed() {
+    return this.doctorsService.seedDoctors();
+  }
 }

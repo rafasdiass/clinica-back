@@ -39,4 +39,57 @@ export class DoctorsService {
     const doctor = await this.findOne(id);
     await this.doctorRepository.remove(doctor);
   }
+
+  /**
+   * Popula o banco de dados com médicos iniciais.
+   */
+  async seedDoctors(): Promise<void> {
+    const initialDoctors = [
+      {
+        name: 'Andrea Brasil',
+        crm: '7587',
+        specialty: 'Oftalmologia',
+        phone: '123456789',
+        email: 'andrea.brasil@example.com',
+      },
+      {
+        name: 'Henrique Guerra',
+        crm: '7588',
+        specialty: 'Oftalmologia',
+        phone: '987654321',
+        email: 'henrique.guerra@example.com',
+      },
+      {
+        name: 'André Mont’alverne',
+        crm: '13883',
+        specialty: 'Glaucoma',
+        phone: '456789123',
+        email: 'andre.montalverne@example.com',
+      },
+      {
+        name: 'Francine Leite',
+        crm: '15646',
+        specialty: 'Medicina do Tráfego',
+        phone: '321654987',
+        email: 'francine.leite@example.com',
+      },
+      {
+        name: 'Carlos Eduardo',
+        crm: '12463',
+        specialty: 'Medicina do Tráfego',
+        phone: '654987321',
+        email: 'carlos.eduardo@example.com',
+      },
+    ];
+
+    for (const doctor of initialDoctors) {
+      const exists = await this.doctorRepository.findOne({
+        where: { crm: doctor.crm },
+      });
+
+      if (!exists) {
+        await this.doctorRepository.save(this.doctorRepository.create(doctor));
+      }
+    }
+  }
 }
