@@ -1,7 +1,7 @@
 import {
   Injectable,
   NotFoundException,
-  ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,47 +18,80 @@ export class UsersService {
 
   /**
    * Retorna todos os usuários.
+   * Funcionários podem ter acesso limitado aos dados.
    */
-  async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(requestingUser: User): Promise<User[]> {
+    if (requestingUser.role === 'admin') {
+      return this.userRepository.find();
+    }
+
+    if (requestingUser.role === 'employee') {
+      // Funcionários só podem visualizar pacientes e seus dados básicos
+      return this.userRepository.find({
+        where: { role: 'patient' },
+        select: ['id', 'email', 'isActive', 'createdAt', 'updatedAt'],
+      });
+    }
+
+    throw new ForbiddenException(
+      'You do not have permission to access this resource',
+    );
   }
 
   /**
-   * Retorna um usuário pelo ID.
-   * @param id ID do usuário
+   * Retorna os dados de um usuário pelo ID.
    */
-  async findOne(id: number): Promise<User> {
+  async findOne(id: number, requestingUser: User): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
+
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    return user;
+
+    if (requestingUser.role === 'admin' || requestingUser.id === user.id) {
+      return user; // Admins podem acessar qualquer usuário, e usuários podem acessar seus próprios dados
+    }
+
+    if (requestingUser.role === 'employee' && user.role === 'patient') {
+      // Funcionários podem acessar apenas dados básicos de pacientes
+      return this.userRepository.findOne({
+        where: { id, role: 'patient' },
+        select: ['id', 'email', 'isActive', 'createdAt', 'updatedAt'],
+      });
+    }
+
+    throw new ForbiddenException(
+      'You do not have permission to access this resource',
+    );
   }
 
   /**
    * Retorna um usuário pelo e-mail.
-   * @param email E-mail do usuário
+   * Usado no processo de autenticação.
    */
   async findByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { email } });
+
     if (!user) {
       throw new NotFoundException(`User with email ${email} not found`);
     }
+
     return user;
   }
 
   /**
    * Cria um novo usuário.
-   * @param createUserDto Dados do usuário
    */
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const existingUser = await this.userRepository.findOne({
-      where: { email: createUserDto.email },
-    });
-
-    if (existingUser) {
-      throw new ConflictException(
-        `User with email ${createUserDto.email} already exists`,
+  async create(
+    createUserDto: CreateUserDto,
+    requestingUser: User,
+  ): Promise<User> {
+    if (
+      requestingUser.role === 'employee' &&
+      createUserDto.role !== 'patient'
+    ) {
+      throw new ForbiddenException(
+        'Employees can only create patient accounts',
       );
     }
 
@@ -67,22 +100,36 @@ export class UsersService {
   }
 
   /**
-   * Atualiza um usuário existente.
-   * @param id ID do usuário
-   * @param updateUserDto Dados atualizados
+   * Atualiza os dados de um usuário.
    */
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findOne(id);
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    requestingUser: User,
+  ): Promise<User> {
+    const user = await this.findOne(id, requestingUser);
+
+    if (requestingUser.role === 'patient' && requestingUser.id !== user.id) {
+      throw new ForbiddenException('Patients can only update their own data');
+    }
+
+    if (requestingUser.role === 'employee' && user.role !== 'patient') {
+      throw new ForbiddenException('Employees can only update patient data');
+    }
+
     Object.assign(user, updateUserDto);
     return this.userRepository.save(user);
   }
 
   /**
    * Remove um usuário pelo ID.
-   * @param id ID do usuário
    */
-  async remove(id: number): Promise<void> {
-    const user = await this.findOne(id);
+  async remove(id: number, requestingUser: User): Promise<void> {
+    if (requestingUser.role !== 'admin') {
+      throw new ForbiddenException('Only admins can remove users');
+    }
+
+    const user = await this.findOne(id, requestingUser);
     await this.userRepository.remove(user);
   }
 }

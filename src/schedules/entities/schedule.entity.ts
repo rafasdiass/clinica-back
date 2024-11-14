@@ -17,16 +17,13 @@ export class Schedule {
   doctor: Doctor;
 
   @Column()
-  day: string; // Exemplo: '2024-11-13'
+  date: string; // Data da agenda no formato YYYY-MM-DD
 
   @Column()
-  startTime: string; // Exemplo: '09:00'
+  startTime: string; // Hora de início (HH:mm)
 
   @Column()
-  endTime: string; // Exemplo: '09:30'
-
-  @Column({ default: false })
-  isBlocked: boolean;
+  endTime: string; // Hora de término (HH:mm)
 
   @CreateDateColumn()
   createdAt: Date;

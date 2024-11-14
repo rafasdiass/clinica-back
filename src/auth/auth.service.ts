@@ -8,21 +8,15 @@ import { LoginDto } from './dto/login.dto';
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly usersService: UsersService, // Injeta o serviço de usuários
+    private readonly usersService: UsersService,
   ) {}
 
-  /**
-   * Gera um token JWT para o usuário autenticado.
-   */
   async login(user: User): Promise<{ accessToken: string }> {
     const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload);
     return { accessToken };
   }
 
-  /**
-   * Valida o usuário no processo de autenticação.
-   */
   async validateUser(loginDto: LoginDto): Promise<User> {
     const user = await this.usersService.findByEmail(loginDto.email);
     if (user && user.password === loginDto.password) {
@@ -31,3 +25,4 @@ export class AuthService {
     throw new UnauthorizedException('Invalid credentials');
   }
 }
+

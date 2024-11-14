@@ -1,22 +1,35 @@
-import { IsString, IsNotEmpty, IsBoolean, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsBoolean,
+  IsOptional,
+  IsDateString,
+  Matches,
+} from 'class-validator';
 
 export class CreateScheduleDto {
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
-  day: string; // Exemplo: '2024-11-13'
+  date: string; // Data da agenda no formato ISO (YYYY-MM-DD)
 
   @IsString()
   @IsNotEmpty()
-  startTime: string; // Exemplo: '09:00'
+  @Matches(/^\d{2}:\d{2}$/, {
+    message: 'startTime deve estar no formato HH:mm',
+  })
+  startTime: string; // Hora de início no formato 'HH:mm'
 
   @IsString()
   @IsNotEmpty()
-  endTime: string; // Exemplo: '09:30'
+  @Matches(/^\d{2}:\d{2}$/, {
+    message: 'endTime deve estar no formato HH:mm',
+  })
+  endTime: string; // Hora de término no formato 'HH:mm'
 
   @IsOptional()
   @IsBoolean()
-  isBlocked?: boolean;
+  isBlocked?: boolean; // Indica se o horário está bloqueado para consultas
 
   @IsNotEmpty()
-  doctorId: number; // ID do médico
+  doctorId: number; // ID do médico associado à agenda
 }

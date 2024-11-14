@@ -21,25 +21,21 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ default: 'user' }) // Pode ser 'admin', 'doctor', 'employee', 'patient'
+  @Column({ default: 'patient' }) // Pode ser 'admin', 'doctor', 'employee', 'patient'
   role: string;
 
   @Column({ default: true })
   isActive: boolean;
 
-  // Relação com pacientes (caso seja um médico)
   @OneToMany(() => Patient, (patient) => patient.user)
   patients: Patient[];
 
-  // Relação com agendamentos (caso seja um paciente)
   @OneToMany(() => Appointment, (appointment) => appointment.patient)
   appointments: Appointment[];
 
-  // Relação com exames (caso seja um paciente)
   @OneToMany(() => Exam, (exam) => exam.patient)
   exams: Exam[];
 
-  // Permissões adicionais em formato JSON
   @Column({ type: 'json', nullable: true })
   permissions: Record<string, boolean>;
 
