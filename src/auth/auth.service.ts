@@ -1,11 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly usersService: UsersService, // Injeta o serviço de usuários
+  ) {}
 
   /**
    * Gera um token JWT para o usuário autenticado.
@@ -19,7 +23,8 @@ export class AuthService {
   /**
    * Valida o usuário no processo de autenticação.
    */
-  async validateUser(loginDto: LoginDto, user: User): Promise<User> {
+  async validateUser(loginDto: LoginDto): Promise<User> {
+    const user = await this.usersService.findByEmail(loginDto.email);
     if (user && user.password === loginDto.password) {
       return user;
     }

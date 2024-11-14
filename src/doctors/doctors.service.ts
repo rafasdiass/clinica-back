@@ -12,10 +12,17 @@ export class DoctorsService {
     private readonly doctorRepository: Repository<Doctor>,
   ) {}
 
+  /**
+   * Retorna todos os médicos cadastrados.
+   */
   async findAll(): Promise<Doctor[]> {
     return this.doctorRepository.find();
   }
 
+  /**
+   * Retorna um médico pelo ID.
+   * @param id - ID do médico.
+   */
   async findOne(id: number): Promise<Doctor> {
     const doctor = await this.doctorRepository.findOne({ where: { id } });
     if (!doctor) {
@@ -24,17 +31,30 @@ export class DoctorsService {
     return doctor;
   }
 
+  /**
+   * Cria um novo médico.
+   * @param createDoctorDto - Dados do médico a ser criado.
+   */
   async create(createDoctorDto: CreateDoctorDto): Promise<Doctor> {
     const doctor = this.doctorRepository.create(createDoctorDto);
     return this.doctorRepository.save(doctor);
   }
 
+  /**
+   * Atualiza os dados de um médico existente.
+   * @param id - ID do médico.
+   * @param updateDoctorDto - Dados atualizados do médico.
+   */
   async update(id: number, updateDoctorDto: UpdateDoctorDto): Promise<Doctor> {
     const doctor = await this.findOne(id);
     Object.assign(doctor, updateDoctorDto);
     return this.doctorRepository.save(doctor);
   }
 
+  /**
+   * Remove um médico existente.
+   * @param id - ID do médico.
+   */
   async remove(id: number): Promise<void> {
     const doctor = await this.findOne(id);
     await this.doctorRepository.remove(doctor);
@@ -88,7 +108,8 @@ export class DoctorsService {
       });
 
       if (!exists) {
-        await this.doctorRepository.save(this.doctorRepository.create(doctor));
+        const newDoctor = this.doctorRepository.create(doctor);
+        await this.doctorRepository.save(newDoctor);
       }
     }
   }
