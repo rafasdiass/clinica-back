@@ -7,15 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-
-export class PaymentDto {
-  @IsNotEmpty()
-  @IsString()
-  method: string; // Forma de pagamento (ex: cash, card)
-
-  @IsNotEmpty()
-  amount: number; // Valor pago
-}
+import { PaymentDto } from 'src/payments/dto/payment.dto';
 
 export class CreateAppointmentDto {
   @IsString()

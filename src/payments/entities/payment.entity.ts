@@ -2,10 +2,11 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
   ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { Appointment } from 'src/appointments/entities/appointment.entity';
+import { Appointment } from '../../appointments/entities/appointment.entity';
 
 @Entity('payments')
 export class Payment {
@@ -13,14 +14,19 @@ export class Payment {
   id: number;
 
   @Column()
-  method: string; // Forma de pagamento: 'cash', 'credit_card', 'debit_card', etc.
+  method: string; // Exemplo: 'cash', 'credit_card', 'insurance'
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  amount: number; // Valor do pagamento
+  @Column('decimal', { precision: 10, scale: 2 })
+  amount: number;
 
-  @ManyToOne(() => Appointment, (appointment) => appointment.payments)
+  @ManyToOne(() => Appointment, (appointment) => appointment.payments, {
+    eager: true,
+  })
   appointment: Appointment;
 
   @CreateDateColumn()
-  paidAt: Date; // Data do pagamento
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

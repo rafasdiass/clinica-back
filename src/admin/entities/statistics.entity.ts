@@ -1,4 +1,3 @@
-// src/admin/entities/statistics.entity.ts
 export class Statistics {
   totalDoctors: number;
   totalPatients: number;

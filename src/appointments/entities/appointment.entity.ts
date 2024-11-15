@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Doctor } from '../../doctors/entities/doctor.entity';
-import { Payment } from 'src/payments/entities/payment.entity';
+import { Payment } from '../../payments/entities/payment.entity';
 
 @Entity('appointments')
 export class Appointment {
@@ -34,7 +34,7 @@ export class Appointment {
   @ManyToOne(() => Doctor, (doctor) => doctor.appointments, { eager: true })
   doctor: Doctor;
 
-  @OneToMany(() => Payment, (payment) => payment.appointment, { eager: true })
+  @OneToMany(() => Payment, (payment) => payment.appointment, { cascade: true })
   payments: Payment[];
 
   @CreateDateColumn()
