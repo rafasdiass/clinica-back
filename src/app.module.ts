@@ -9,6 +9,10 @@ import { AppointmentsModule } from './appointments/appointments.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { PatientsModule } from './patients/patients.module';
 import { ExamsModule } from './exams/exams.module';
+import { AdminModule } from './admin/admin.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { PricingModule } from './pricing/pricing.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -38,6 +42,10 @@ import { ExamsModule } from './exams/exams.module';
     DashboardModule,
     PatientsModule,
     ExamsModule,
+    AdminModule,
+    NotificationsModule,
+    PricingModule,
+    PaymentsModule,
   ],
 })
 export class AppModule {}

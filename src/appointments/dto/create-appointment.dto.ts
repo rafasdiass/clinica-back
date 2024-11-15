@@ -1,4 +1,21 @@
-import { IsString, IsNotEmpty, IsIn, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsIn,
+  IsOptional,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class PaymentDto {
+  @IsNotEmpty()
+  @IsString()
+  method: string; // Forma de pagamento (ex: cash, card)
+
+  @IsNotEmpty()
+  amount: number; // Valor pago
+}
 
 export class CreateAppointmentDto {
   @IsString()
@@ -22,4 +39,10 @@ export class CreateAppointmentDto {
 
   @IsNotEmpty()
   doctorId: number;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PaymentDto)
+  payments?: PaymentDto[];
 }
