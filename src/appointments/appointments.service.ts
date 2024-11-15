@@ -26,7 +26,7 @@ export class AppointmentsService {
    */
   async findAll(): Promise<Appointment[]> {
     return this.appointmentRepository.find({
-      relations: ['payments', 'doctor', 'patient'], // Inclui as relações necessárias
+      relations: ['payments', 'doctor', 'patient'], // Inclui todas as relações necessárias
     });
   }
 
@@ -36,7 +36,7 @@ export class AppointmentsService {
   async findOne(id: number): Promise<Appointment> {
     const appointment = await this.appointmentRepository.findOne({
       where: { id },
-      relations: ['payments', 'doctor', 'patient'], // Inclui as relações necessárias
+      relations: ['payments', 'doctor', 'patient'], // Inclui todas as relações necessárias
     });
 
     if (!appointment) {
